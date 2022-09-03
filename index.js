@@ -1,6 +1,10 @@
 let sayı = 5
+let super1_sayac = 0
+let godlike = false
+let superguc = 0
 let ı = 0
 let vurulandusman = 0;
+const powerups = []
 const canvas = document.getElementById("c")
 const ctx = canvas.getContext("2d")
 canvas.width = innerWidth
@@ -96,7 +100,8 @@ class Invader {
         }
 
     }
-    shoot(inv_projectiles) {
+    shoot(inv_projectiles, powerup) {
+        this.powerup = powerup
         inv_projectiles.push
             (new Inv_projectile({
                 position: {
@@ -191,7 +196,7 @@ class Particle {
 
         this.position.x += this.velocity.x
         this.position.y += this.velocity.y
-        if (this.fades) this.opacity -= 0.0125
+        if (this.fades) this.opacity -= 0.025
 
 
 
@@ -210,13 +215,44 @@ class Projectile {
         this.position = position
         this.velocity = velocity
         this.radius = 3
+
     }
     draw() {
-        ctx.strokeStyle = "white"
+        if (godlike) {
+            ctx.strokeStyle = "red"
+            ctx.beginPath();
+            ctx.arc(this.position.x, this.position.y, this.radius, 0, 2 * Math.PI);
+            ctx.stroke();
+        } else {
+            ctx.strokeStyle = "white"
+            ctx.beginPath();
+            ctx.arc(this.position.x, this.position.y, this.radius, 0, 2 * Math.PI);
+            ctx.stroke();
+        }
+
+
+
+    }
+    update() {
+        this.draw()
+        this.position.y += this.velocity.y
+        this.position.x += this.velocity.x
+
+
+    }
+}
+class Powerup {
+    constructor({ position, velocity }) {
+        this.position = position
+        this.velocity = velocity
+        this.radius = 8
+    }
+    draw() {
+
+        ctx.strokeStyle = "red"
         ctx.beginPath();
         ctx.arc(this.position.x, this.position.y, this.radius, 0, 2 * Math.PI);
         ctx.stroke();
-
 
 
     }
@@ -226,7 +262,9 @@ class Projectile {
         this.position.y += this.velocity.y
         this.position.x += this.velocity.x
     }
+
 }
+
 
 
 class Inv_projectile {
@@ -303,6 +341,7 @@ for (let i = 0; i < 150; i++) {
 }
 
 function animate() {
+
     if (!game.active) {
         return;
     }
@@ -326,6 +365,28 @@ function animate() {
         }
 
     });
+    powerups.forEach((powerup, powerupIndex) => {
+        powerup.update()
+        if (powerup.position.y - powerup.radius <= player.position.y + player.height &&
+            powerup.position.y + powerup.radius >= player.position.y &&
+            powerup.position.x - powerup.radius <= player.position.x + player.width &&
+            powerup.position.x + powerup.radius >= player.position.x
+        ) {
+            powerups.splice(powerupIndex, 1)
+            godlike = true
+            let time = setInterval(() => {
+                super1_sayac++;
+                console.log(super1_sayac + "  " + godlike)
+                if (super1_sayac == 15) {
+                    godlike = false
+
+                    clearInterval(time);
+                    super1_sayac = 0
+                }
+            }, 1000);
+
+        }
+    })
 
 
     projectiles.forEach((projectile, projectileIndex) => {
@@ -348,10 +409,12 @@ function animate() {
             inv_projectile.update()
 
         }
+
+
         if (inv_projectile.position.y + inv_projectile.height >= player.position.y &&
             inv_projectile.position.y < player.position.y + player.height &&
             inv_projectile.position.x >= player.position.x &&
-            inv_projectile.position.x <= player.position.x + player.width) {
+            inv_projectile.position.x <= player.position.x + player.width && godlike == false) {
 
             setTimeout(() => {
                 inv_projectiles.splice(inv_projectileIndex, 1)
@@ -369,7 +432,7 @@ function animate() {
 
 
     });
-    console.log(inv_projectiles)
+
     grids.forEach((grid, Gi) => {
         grid.update()
         if (frames % 50 == 0 && grid.invaders.length > 0) {
@@ -379,11 +442,34 @@ function animate() {
             invader.update({ velocity: grid.velocity })
             projectiles.forEach((projectile, Pindex) => {
 
+
+
                 if (projectile.position.y - projectile.radius <= invader.position.y + invader.height &&
                     projectile.position.y + projectile.radius >= invader.position.y &&
                     projectile.position.x - projectile.radius <= invader.position.x + invader.width &&
                     projectile.position.x + projectile.radius >= invader.position.x
                 ) {
+                    let superguc = Math.random() * 500 * 1;
+
+                    if (superguc <= 2.5) {
+                        powerups.push(new Powerup({
+                            position: {
+                                x: invader.position.x,
+                                y: invader.position.y
+                            },
+                            velocity: {
+                                y: 3,
+                                x: 0
+
+
+
+                            }
+
+
+
+                        }))
+
+                    }
                     vurulandusman++;
                     span.innerText = vurulandusman
                     setTimeout(() => {
@@ -412,6 +498,8 @@ function animate() {
 
 
     })
+
+
     if (keys.a.pressed && player.position.x >= 0) {
         player.velocity.x = -5
         player.rotation = -0.15
@@ -441,17 +529,17 @@ addEventListener("keydown", function ({ key }) {
             keys.a.pressed = true
             break;
 
-        // case "A":
-        //     keys.a.pressed = true
-        //     break;
+        case "A":
+            keys.a.pressed = true
+            break;
 
 
         case "d":
             keys.d.pressed = true
             break;
-        // case "D":
-        //     keys.d.pressed = true
-        //     break;
+        case "D":
+            keys.d.pressed = true
+            break;
 
         case " ":
 
