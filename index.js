@@ -451,7 +451,7 @@ function animate() {
                 ) {
                     let superguc = Math.random() * 500 * 1;
 
-                    if (superguc <= 3) {
+                    if (superguc <= 5) {
                         powerups.push(new Powerup({
                             position: {
                                 x: invader.position.x,
