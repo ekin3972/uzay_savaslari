@@ -1,5 +1,11 @@
 let sayı = 5
+let loosing_alpha = 0.025
+let which_powerup = 0
+let radius = 3
+let powerup_color = 0
+let auto_kill = false
 let super1_sayac = 0
+let super2_sayac = 0
 let godlike = false
 let superguc = 0
 let ı = 0
@@ -196,7 +202,7 @@ class Particle {
 
         this.position.x += this.velocity.x
         this.position.y += this.velocity.y
-        if (this.fades) this.opacity -= 0.025
+        if (this.fades) this.opacity -= loosing_alpha
 
 
 
@@ -214,19 +220,19 @@ class Projectile {
     constructor({ position, velocity }) {
         this.position = position
         this.velocity = velocity
-        this.radius = 3
+        this.radius = radius
 
     }
     draw() {
         if (godlike) {
             ctx.strokeStyle = "red"
             ctx.beginPath();
-            ctx.arc(this.position.x, this.position.y, this.radius, 0, 2 * Math.PI);
+            ctx.arc(this.position.x, this.position.y, radius, 0, 2 * Math.PI);
             ctx.stroke();
         } else {
             ctx.strokeStyle = "white"
             ctx.beginPath();
-            ctx.arc(this.position.x, this.position.y, this.radius, 0, 2 * Math.PI);
+            ctx.arc(this.position.x, this.position.y, radius, 0, 2 * Math.PI);
             ctx.stroke();
         }
 
@@ -246,10 +252,11 @@ class Powerup {
         this.position = position
         this.velocity = velocity
         this.radius = 8
+
     }
     draw() {
 
-        ctx.strokeStyle = "red"
+        ctx.strokeStyle = powerup_color
         ctx.beginPath();
         ctx.arc(this.position.x, this.position.y, this.radius, 0, 2 * Math.PI);
         ctx.stroke();
@@ -373,17 +380,37 @@ function animate() {
             powerup.position.x + powerup.radius >= player.position.x
         ) {
             powerups.splice(powerupIndex, 1)
-            godlike = true
-            let time = setInterval(() => {
-                super1_sayac++;
-                console.log(super1_sayac + "  " + godlike)
-                if (super1_sayac == 15) {
-                    godlike = false
+            if (which_powerup == 1) {
+                auto_kill = true
+                radius = 100000000
+                loosing_alpha = 0.08
+                let time = setInterval(() => {
+                    super1_sayac++;
+                    console.log(super1_sayac + "  " + godlike)
+                    if (super1_sayac == 8) {
+                        auto_kill = false
+                        radius = 3
+                        loosing_alpha = 0.025
 
-                    clearInterval(time);
-                    super1_sayac = 0
-                }
-            }, 1000);
+                        clearInterval(time);
+                        super1_sayac = 0
+                    }
+                }, 1000);
+            }
+            if (which_powerup == 2) {
+                godlike = true
+                let time = setInterval(() => {
+                    super2_sayac++;
+                    console.log(super1_sayac + "  " + godlike)
+                    if (super2_sayac == 15) {
+                        godlike = false
+
+                        clearInterval(time);
+                        super2_sayac = 0
+                    }
+                }, 1000);
+
+            }
 
         }
     })
@@ -449,26 +476,53 @@ function animate() {
                     projectile.position.x - projectile.radius <= invader.position.x + invader.width &&
                     projectile.position.x + projectile.radius >= invader.position.x
                 ) {
-                    let superguc = Math.random() * 500 * 1;
+                    let superguc = Math.random() * 500;
 
                     if (superguc <= 2.5) {
-                        powerups.push(new Powerup({
-                            position: {
-                                x: invader.position.x,
-                                y: invader.position.y
-                            },
-                            velocity: {
-                                y: 3,
-                                x: 0
+                        console.log(superguc)
+                        if (superguc <= 1.25) {
+                            which_powerup = 1
+                            powerup_color = "green"
+                            powerups.push(new Powerup({
+                                position: {
+                                    x: invader.position.x,
+                                    y: invader.position.y
+                                },
+                                velocity: {
+                                    y: 3,
+                                    x: 0
 
 
 
-                            }
+                                }
 
 
 
-                        }))
 
+                            }))
+                        }
+                        if (superguc <= 2.5 && superguc > 1.25) {
+                            which_powerup = 2
+                            powerup_color = "red"
+                            powerups.push(new Powerup({
+                                position: {
+                                    x: invader.position.x,
+                                    y: invader.position.y
+                                },
+                                velocity: {
+                                    y: 3,
+                                    x: 0
+
+
+
+                                }
+
+
+
+
+                            }))
+
+                        }
                     }
                     vurulandusman++;
                     span.innerText = vurulandusman
@@ -559,6 +613,7 @@ addEventListener("keydown", function ({ key }) {
                     x: -0.0000009
 
                 }
+
             }))
 
             //     a = false
@@ -595,6 +650,8 @@ addEventListener("keyup", function ({ key }) {
             break;
     }
 })
+
+
 
 
 
