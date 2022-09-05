@@ -381,6 +381,7 @@ function animate() {
         ) {
             powerups.splice(powerupIndex, 1)
             if (which_powerup == 1) {
+                super1_sayac = 0
                 auto_kill = true
                 radius = 100000000
                 loosing_alpha = 0.08
@@ -398,6 +399,7 @@ function animate() {
                 }, 1000);
             }
             if (which_powerup == 2) {
+                super2_sayac = 0
                 godlike = true
                 let time = setInterval(() => {
                     super2_sayac++;
@@ -650,8 +652,6 @@ addEventListener("keyup", function ({ key }) {
             break;
     }
 })
-
-
 
 
 
